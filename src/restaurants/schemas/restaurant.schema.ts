@@ -6,10 +6,10 @@ export type RestaurantDocument = HydratedDocument<Restaurant>;
 @Schema({ _id: false })
 class Location {
   @Prop({ type: String, enum: ['Point'], default: 'Point' })
-  type: 'Point';
+  type!: 'Point';
 
   @Prop({ type: [Number], required: true })
-  coordinates: [number, number];
+  coordinates!: [number, number];
 }
 
 const LocationSchema = SchemaFactory.createForClass(Location);
@@ -17,19 +17,19 @@ const LocationSchema = SchemaFactory.createForClass(Location);
 @Schema({ timestamps: true })
 export class Restaurant {
   @Prop({ required: true, trim: true })
-  nameAr: string;
+  nameAr!: string;
 
   @Prop({ required: true, trim: true })
-  nameEn: string;
+  nameEn!: string;
 
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
-  slug: string;
+  slug!: string;
 
   @Prop({ type: [String], required: true })
-  cuisines: string[];
+  cuisines!: string[];
 
   @Prop({ type: LocationSchema, required: true })
-  location: Location;
+  location!: Location;
 }
 
 export const RestaurantSchema = SchemaFactory.createForClass(Restaurant);
