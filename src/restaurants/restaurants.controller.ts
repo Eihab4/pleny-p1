@@ -4,6 +4,7 @@ import { RESTAURANT_MESSAGES } from '../common/constants/restaurant-messages';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CreateRestaurantRequest } from './dto/requests/create-restaurant.request';
 import { ListRestaurantsRequest } from './dto/requests/list-restaurants.request';
+import { NearbyRestaurantsRequest } from './dto/requests/nearby-restaurants.request';
 import { RestaurantsService } from './restaurants.service';
 
 @ApiTags('Restaurants')
@@ -23,6 +24,13 @@ export class RestaurantsController {
   @ResponseMessage(RESTAURANT_MESSAGES.LISTED)
   findAll(@Query() query: ListRestaurantsRequest) {
     return this.restaurantsService.findAll(query);
+  }
+
+  @Get('nearby')
+  @ApiOperation({ summary: 'Find restaurants within 1km, nearest first' })
+  @ResponseMessage(RESTAURANT_MESSAGES.NEARBY_LISTED)
+  findNearby(@Query() query: NearbyRestaurantsRequest) {
+    return this.restaurantsService.findNearby(query);
   }
 
   @Get(':idOrSlug')

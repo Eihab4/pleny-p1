@@ -10,6 +10,11 @@ import { RESTAURANT_MESSAGES } from '../common/constants/restaurant-messages';
 import { PaginatedResponse } from '../common/dto/responses/paginated.response';
 import { CreateRestaurantRequest } from './dto/requests/create-restaurant.request';
 import { ListRestaurantsRequest } from './dto/requests/list-restaurants.request';
+import { NearbyRestaurantsRequest } from './dto/requests/nearby-restaurants.request';
+import {
+  NearbyRestaurantResponse,
+  RestaurantWithDistance,
+} from './dto/responses/nearby-restaurant.response';
 import { RestaurantResponse } from './dto/responses/restaurant.response';
 import { Restaurant } from './schemas/restaurant.schema';
 import slugify from 'slugify';
@@ -65,5 +70,27 @@ export class RestaurantsService {
     }
 
     return RestaurantResponse.fromEntity(found);
+  }
+
+  async findNearby(
+    query: NearbyRestaurantsRequest,
+  ): Promise<NearbyRestaurantResponse[]> {
+    const { lng, lat } = query;
+
+    // $nearSphere would also work here, but $geoNear lets us return the actual
+    // distance to each restaurant for a better client experience.
+    const results =
+      await this.restaurantModel.aggregate<RestaurantWithDistance>([
+        {
+          $geoNear: {
+            near: { type: 'Point', coordinates: [lng, lat] },
+            distanceField: 'distanceInMeters',
+            maxDistance: 1000,
+            spherical: true,
+          },
+        },
+      ]);
+
+    return results.map((doc) => NearbyRestaurantResponse.fromAggregate(doc));
   }
 }
