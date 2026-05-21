@@ -1,9 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RESTAURANT_MESSAGES } from '../common/constants/restaurant-messages';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
 import { CreateRestaurantRequest } from './dto/requests/create-restaurant.request';
-import { RestaurantResponse } from './dto/responses/restaurant.response';
+import { ListRestaurantsRequest } from './dto/requests/list-restaurants.request';
 import { RestaurantsService } from './restaurants.service';
 
 @ApiTags('Restaurants')
@@ -14,8 +14,14 @@ export class RestaurantsController {
   @Post()
   @ApiOperation({ summary: 'Create a restaurant' })
   @ResponseMessage(RESTAURANT_MESSAGES.CREATED)
-  async create(@Body() dto: CreateRestaurantRequest) {
-    const restaurant = await this.restaurantsService.create(dto);
-    return RestaurantResponse.fromEntity(restaurant);
+  create(@Body() dto: CreateRestaurantRequest) {
+    return this.restaurantsService.create(dto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'List restaurants, optionally filtered by cuisine' })
+  @ResponseMessage(RESTAURANT_MESSAGES.LISTED)
+  findAll(@Query() query: ListRestaurantsRequest) {
+    return this.restaurantsService.findAll(query);
   }
 }
