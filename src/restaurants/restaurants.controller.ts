@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RESTAURANT_MESSAGES } from '../common/constants/restaurant-messages';
 import { ResponseMessage } from '../common/decorators/response-message.decorator';
@@ -23,5 +23,12 @@ export class RestaurantsController {
   @ResponseMessage(RESTAURANT_MESSAGES.LISTED)
   findAll(@Query() query: ListRestaurantsRequest) {
     return this.restaurantsService.findAll(query);
+  }
+
+  @Get(':idOrSlug')
+  @ApiOperation({ summary: 'Get a restaurant by id or slug' })
+  @ResponseMessage(RESTAURANT_MESSAGES.RETRIEVED)
+  findOne(@Param('idOrSlug') idOrSlug: string) {
+    return this.restaurantsService.findOne(idOrSlug);
   }
 }

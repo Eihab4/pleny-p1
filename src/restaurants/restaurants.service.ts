@@ -1,7 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { MongoServerError } from 'mongodb';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { RESTAURANT_MESSAGES } from '../common/constants/restaurant-messages';
 import { PaginatedResponse } from '../common/dto/responses/paginated.response';
 import { CreateRestaurantRequest } from './dto/requests/create-restaurant.request';
@@ -49,5 +53,17 @@ export class RestaurantsService {
       page,
       limit,
     );
+  }
+
+  async findOne(idOrSlug: string): Promise<RestaurantResponse> {
+    const found = await this.restaurantModel.findOne(
+      isValidObjectId(idOrSlug) ? { _id: idOrSlug } : { slug: idOrSlug },
+    );
+
+    if (!found) {
+      throw new NotFoundException(RESTAURANT_MESSAGES.NOT_FOUND);
+    }
+
+    return RestaurantResponse.fromEntity(found);
   }
 }
